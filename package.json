@@ -12,7 +12,7 @@
     "prebuild:package": "npm install",
     "build:package": "ng-packagr -p lib/package.json",
     "prepublish:local": "npm run build:package",
-    "publish:local": "cd ../../ && npm install libs/asu-datepicker/dist/ --no-save"
+    "publish:local": "cd ../../ && npm install libs/asu-datepicker/dist/package"
   },
   "private": true,
   "dependencies": {
