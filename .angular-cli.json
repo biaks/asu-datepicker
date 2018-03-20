@@ -36,10 +36,12 @@
       "polyfills":         "polyfills.ts",
       "tsconfig":          "tsconfig-flat.json",
       "prefix":            "app",
-      "styles":          [ "../../../packages/asu-guide/scss/main.scss" ],
+      "styles":          [ "../node_modules/asu-guide/scss/main.scss" ],
       "environmentSource": "environments/environment.ts",
       "assets": [
-        "./assets"
+        "./assets",
+        "favicon.ico",
+        { "glob": "**/*", "input": "../node_modules/asu-guide/assets/", "output": "./assets/" }
       ],
       "environments": {
         "dev": "environments/environment.ts",
@@ -54,11 +56,12 @@
       "polyfills":         "polyfills.ts",
       "tsconfig":          "tsconfig-use-package.json",
       "prefix":            "app",
-      "styles":          [ "../../../packages/asu-guide/scss/main.scss" ],
+      "styles":          [ "../node_modules/asu-guide/scss/main.scss" ],
       "environmentSource": "environments/environment.ts",
       "assets": [
         "assets",
-        "favicon.ico"
+        "favicon.ico",
+        { "glob": "**/*", "input": "../node_modules/asu-guide/assets/", "output": "./assets/" }
       ],
       "environments": {
         "dev": "environments/environment.ts",

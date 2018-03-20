@@ -4,10 +4,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { AppComponent } from './app.component';
 
-import { DatepickerModule } from 'datepicker';
-import { DatepickerComponent } from 'datepicker';
-// import { DatepickerDirective } from 'datepicker';
-// import { DatepickerControl } from 'datepicker';
+import { DatepickerModule } from 'asu-datepicker';
+import { DatepickerComponent } from 'asu-datepicker';
+// import { DatepickerDirective } from 'asu-datepicker';
+// import { DatepickerControl } from 'asu-datepicker';
 
 @NgModule({
   declarations: [

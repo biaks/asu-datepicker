@@ -27,8 +27,7 @@
     //"typeRoots":              ["node_modules/@types"],
     "baseUrl":                ".", // Base directory to resolve non-relative module names. Need for 'paths'
       "paths": {                   // List of path mapping entries for module names to locations relative to the baseUrl
-      "datepicker": [ "../lib" ],  
-      "asu":        [ "../../packages/asu/" ]  
+      "asu-datepicker": [ "../lib" ]
     },
     //"skipLibCheck":           true,  // false  Skip type checking of all declaration files (*.d.ts). If false, you nned to add all used @types into devDependences
     //"stripInternal":          true,  // false  Do not emit declarations for code that has an /** @internal */ JSDoc annotation.
