@@ -1,0 +1,55 @@
+{
+  "compileOnSave":   false,
+  //"include": [ "./**/*", "../lib/**/*" ],
+  //"exclude": ["node_modules/*","dist/*"],
+  // http://www.typescriptlang.org/docs/handbook/compiler-options.html
+  "compilerOptions": {
+    "target":                 "es2015",      // ES3  Specify ECMAScript target version: "ES3" (default), "ES5", "ES6"/"ES2015", "ES2016", "ES2017" or "ESNext".
+                                          // Note: "ESNext" targets latest supported ES proposed features.
+    "module":                 "es2015",   // target === "ES3" or "ES5" ? "CommonJS" : "ES6"
+                                          // Specify module code generation: "None", "CommonJS", "AMD", "System", "UMD", "ES6", "ES2015" or "ESNext".
+                                          // Only "AMD" and "System" can be used in conjunction with --outFile.
+                                          // "ES6" and "ES2015" values may be used when targeting "ES5" or lower.
+    "moduleResolution":       "node",     // module === "AMD" or "System" or "ES6" ? "Classic" : "Node"
+                                          // The default is 'Classic' for --module AMD | System | ES2015 or 'Node' otherwise.
+    "lib":                    ["es2015", "dom"], // target === ES5: DOM,ES5,ScriptHost || target === ES6: DOM,ES6,DOM.Iterable,ScriptHost
+                                          // List of library files to be included in the compilation.
+                                          // DOM автоматом не добавляется, офф документация врёт
+
+    "outDir":                 "../dist/demo-use-package",  // Redirect output structure to the directory.
+    "sourceMap":              true,  // false  Generates corresponding .map file.
+    "declaration":            false, // false  Generates corresponding .d.ts file.
+    "emitDecoratorMetadata":  true,  // false  Emit design-type metadata for decorated declarations in source. (добавлять ли информацию о декораторах в выходной файл)
+    "experimentalDecorators": true,  // false  Enables experimental support for ES decorators.
+    "removeComments":         false, // false  Remove all comments except copy-right header comments beginning with /*!
+    "listEmittedFiles":       true,  // false  Print names of generated files part of the compilation.
+    //"listFiles":              true,  // false  Print names of files part of the compilation.
+    //"typeRoots":              ["node_modules/@types"],
+    "baseUrl":                ".", // Base directory to resolve non-relative module names. Need for 'paths'
+      "paths": {                   // List of path mapping entries for module names to locations relative to the baseUrl
+      "datepicker": [ "../dist/package" ]  
+    },
+    //"skipLibCheck":           true,  // false  Skip type checking of all declaration files (*.d.ts). If false, you nned to add all used @types into devDependences
+    //"stripInternal":          true,  // false  Do not emit declarations for code that has an /** @internal */ JSDoc annotation.
+    // don't auto-discover @types/node, it results in a ///<reference in the .d.ts output
+    "types":                  []     //        List of names of type definitions to include.                 
+  },
+  // https://angular.io/guide/aot-compiler#angular-compiler-options
+  //"files": ["./src-lib/index.ts"],
+  "angularCompilerOptions": {
+    // взял из примера simple ui lib
+    //"annotateForClosureCompiler": true,
+    //"strictMetadataEmit":         true,
+    //"skipTemplateCodegen":        true,
+    //"flatModuleOutFile":          "simple-ui-lib.js", // When set to true, this option tells the template compiler to generate a flat module index of the given file name and the corresponding flat module metadata.
+    //"flatModuleId":               "simple-ui-lib"     // This option specifies the preferred module id to use for importing a flat module.
+    //"preserveWhitespaces":       true, // true  This option tells the compiler whether to remove blank text nodes from compiled templates.
+    //"genDir": ".",
+    //"skipMetadataEmit":          false, // false  This option tells the compiler not to produce .metadata.json files.
+    //"skipTemplateCodegen":       false, // false  This option tells the compiler to suppress emitting .ngfactory.js and .ngstyle.js files.
+    //"strictInjectionParameters": true,  // false  When set to true, this options tells the compiler to report an error for a parameter supplied whose injection type cannot be determined. 
+    //"generateCodeForLibraries":  true,  // true   This option tells the template compiler to generate factory files (.ngfactory.js and .ngstyle.js) for .d.ts files with a corresponding .metadata.json file.
+    //"fullTemplateTypeCheck":     true,  // false  This option tells the compiler to enable the binding expression validation phase of the template compiler which uses TypeScript to validate binding expressions.
+    //"annotationsAs":             "static fields" // static fields  Use this option to modify how the Angular specific annotations are emitted to improve tree-shaking. If 'decorators' TypeScript will emit calls to the __decorate helper. Use --emitDecoratorMetadata for runtime reflection.
+  },
+}

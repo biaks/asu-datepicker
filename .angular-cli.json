@@ -1,0 +1,77 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "project": {
+    "name": "datepicker-project"
+  },
+  "lint": [
+    {
+      "project": "src/tsconfig-flat.json",
+      "exclude": "**/node_modules/**"
+    },
+    {
+      "project": "src/tsconfig-use-package.json",
+      "exclude": "**/node_modules/**"
+    }
+  ],
+  "defaults": {
+    "styleExt": "scss",
+    "component": {
+      "spec": false,
+      "inlineStyle": true,
+      "inlineTemplate": true
+    },
+    "class":     { "spec": false },
+    "directive": { "spec": false },
+    "guard":     { "spec": false },
+    "module":    { "spec": false },
+    "pipe":      { "spec": false },
+    "service":   { "spec": false }
+  },
+  "apps": [
+    { "name":              "demo-flat",
+      "root":              "demo",
+      "outDir":            "dist/demo-flat",
+      "index":             "index.html",
+      "main":              "main.ts",
+      "polyfills":         "polyfills.ts",
+      "tsconfig":          "tsconfig-flat.json",
+      "prefix":            "app",
+      "styles":          [ "../../../packages/asu-guide/scss/main.scss" ],
+      "environmentSource": "environments/environment.ts",
+      "assets": [
+        "./assets"
+      ],
+      "environments": {
+        "dev": "environments/environment.ts",
+        "prod": "environments/environment.prod.ts"
+      }
+    },
+    { "name":              "demo-use-package",
+      "root":              "demo",
+      "outDir":            "dist/demo-use-package",
+      "index":             "index.html",
+      "main":              "main.ts",
+      "polyfills":         "polyfills.ts",
+      "tsconfig":          "tsconfig-use-package.json",
+      "prefix":            "app",
+      "styles":          [ "../../../packages/asu-guide/scss/main.scss" ],
+      "environmentSource": "environments/environment.ts",
+      "assets": [
+        "assets",
+        "favicon.ico"
+      ],
+      "environments": {
+        "dev": "environments/environment.ts",
+        "prod": "environments/environment.prod.ts"
+      }
+    },
+    { "name":              "package",
+      "root":              "lib",
+      "outDir":            "dist/package",
+      "main":              "index.ts",
+      "tsconfig":          "tsconfig.json",
+      "prefix":            "lib"
+    }
+  ]
+
+}

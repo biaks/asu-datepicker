@@ -1,0 +1,70 @@
+
+<br/>
+
+<table>
+  <tr><td>
+    <p>Встраивание через директиву ngx-datepicker</p>
+    <div class="b3-ws-header__date">
+      <div class="b3-datepicker undefined">
+
+        <div class="b3-input-group">
+          <label class="b3-input-group__label b3-input-group__label--static">Планируемая дата</label>
+          <div class="b3-nowrap"><span class="icon icon_calendar-full"></span>
+            <input ngx-datepicker class="b3-input-group__field" [formControl]="myControl1">
+          </div>
+        </div>
+
+      </div>
+      <div class="b3-arrow-dd"></div>
+    </div>
+    <br/>
+    <button type="button" (click)="setDate1()">Set Today</button>
+    <p>Значение {{myControl1.value.toLocaleDateString()}}</p>
+
+    <br/>
+    <p>Встраивание через директиву ngx-datepicker</p>
+    <div class="b3-ws-header__date">
+      <div class="b3-datepicker undefined">
+    
+        <div class="b3-input-group">
+          <label class="b3-input-group__label b3-input-group__label--static">Планируемая дата</label>
+          <div class="b3-nowrap"><span class="icon icon_calendar-full"></span>
+            <input ngx-datepicker class="b3-input-group__field" [formControl]="myControl2">
+          </div>
+        </div>
+      </div>
+      <div class="b3-arrow-dd"></div>
+    </div>
+    <br/>
+    <button type="button" (click)="setDate2()">Set Today</button>
+    <p>Значение {{myControl2.value.toLocaleDateString()}}</p>
+
+    <br/>
+    <p>Встраивание как компонента app-datepicker-input</p>
+    <div class="b3-ws-header__date">
+      <div class="b3-datepicker undefined">
+        <div class="b3-input-group">
+          <label class="b3-input-group__label b3-input-group__label--static">Планируемая дата</label>
+          <div class="b3-nowrap"><span class="icon icon_calendar-full"></span>
+            <app-datepicker-input class="b3-input-group__field" [formControl]="myControl3"></app-datepicker-input>
+          </div>
+        </div>
+      </div>
+      <div class="b3-arrow-dd"></div>
+    </div>
+    <br/>
+    <button type="button" (click)="setDate3()">Set Today</button>
+    <p>Значение {{myControl3.value.toLocaleDateString()}}</p>
+
+  </td>
+  <td width="200"></td>
+  <td valign="top">
+
+    <p>Работа с компонентом app-datepicker напрямую</p>
+    <app-datepicker [value]="date4Value" [position]="{'top':120,'left':460}" (onCompleted)="date4ValueCompleted($event)"></app-datepicker>
+    <button type="button" (click)="setDate4()">Set Today</button>
+    <p>Значение {{date4Value.toLocaleDateString()}}</p>
+    <p>{{date4ValueText}}</p>
+
+  </td></tr>
+</table>
