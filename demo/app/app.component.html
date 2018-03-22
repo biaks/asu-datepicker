@@ -3,7 +3,7 @@
 
 <table>
   <tr><td>
-    <p>1. Встраивание через директиву ngx-datepicker и привязка к formControl</p>
+    <p>1. Встраивание через директиву ngx-datepicker и привязка [formControl]="formControl"</p>
     <div class="b3-ws-header__date">
       <div class="b3-datepicker undefined">
 
@@ -22,7 +22,7 @@
     <p>Значение {{formControl1.value.toLocaleDateString()}}</p>
 
     <br/>
-    <p>2. Встраивание через директиву ngx-datepicker и работа через [value] -> (onCompleted)</p>
+    <p>2. Встраивание через директиву ngx-datepicker и двухстороннее связывание через [(value)]="value"</p>
     <div class="b3-ws-header__date">
       <div class="b3-datepicker undefined">
     
@@ -40,7 +40,7 @@
     <p>Значение {{date1.toLocaleDateString()}}</p>
 
     <br/>
-    <p>Использование компонента app-datepicker-input и привязка к formControl</p>
+    <p>Использование компонента app-datepicker-input и привязка [formControl]="formControl"</p>
     <div class="b3-ws-header__date">
       <div class="b3-datepicker undefined">
         <div class="b3-input-group">
@@ -57,7 +57,7 @@
     <p>Значение {{formControl2.value.toLocaleDateString()}}</p>
 
     <br/>
-    <p>Использование компонента app-datepicker-input и работа через [value] -> (onCompleted)</p>
+    <p>Использование компонента app-datepicker-input и двухстороннее связывание через [(value)]="value"</p>
     <div class="b3-ws-header__date">
       <div class="b3-datepicker undefined">
         <div class="b3-input-group">
@@ -77,10 +77,10 @@
   <td width="200"></td>
   <td valign="top">
 
-    <p>Использование компонента app-datepicker и работа через [value] -> (onCompleted)</p>
+    <p>Использование компонента app-datepicker и двухстороннее связывание через [(value)]="value"</p>
     <app-datepicker [(value)]="date3" [position]="{'top':120,'left':460}"></app-datepicker>
     <button type="button" (click)="setDate3()">Set Today</button>
     <p>Значение {{date3.toLocaleDateString()}}</p>
-
+    
   </td></tr>
 </table>
