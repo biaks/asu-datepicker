@@ -10,7 +10,7 @@
       (click)="stepPrevYear()"><span class="icon icon_chevron-left"></span></button>
       <div class="b3-calendar__header__control-content">
         <button class="b3-calendar__btn b3-calendar__btn_year">
-          {{selectedDate.getFullYear()}}
+          {{selectedValue.getFullYear()}}
         </button>
       </div>
       <button class="b3-calendar__btn b3-calendar__btn_next"
@@ -46,7 +46,7 @@
       </button>
       <div class="b3-calendar__header__control-content">
         <button class="b3-calendar__btn b3-calendar__btn_month">
-          {{monthNames[selectedDate.getMonth()]}}
+          {{monthNames[selectedValue.getMonth()]}}
         </button>
       </div>
       <button class="b3-calendar__btn b3-calendar__btn_next"
@@ -74,10 +74,10 @@
         (click)="stepPrevDay()"><span class="icon icon_chevron-left"></span></button>
       <div class="b3-calendar__header__control-content">
         <div class="b3-calendar__header__day-number">
-          {{selectedDate.getDate()}}
+          {{selectedValue.getDate()}}
         </div>
         <div class="b3-calendar__header__day-title">
-          {{weekDaysNames[correctWeekDay(selectedDate.getDay())]}}
+          {{weekDaysNames[correctWeekDay(selectedValue.getDay())]}}
         </div>
       </div>
       <button class="b3-calendar__btn b3-calendar__btn_next"
@@ -87,12 +87,12 @@
       <div class="b3-calendar__content__control-content">
         <button class="b3-calendar__btn b3-calendar__btn_month"
           (click)="currentMode = selectorMode.months">
-            {{monthNames[selectedDate.getMonth()]}}
+            {{monthNames[selectedValue.getMonth()]}}
           <div class="b3-arrow-dd"></div>
         </button>
         <button class="b3-calendar__btn b3-calendar__btn_year"
         (click)="currentMode = selectorMode.years">
-          {{selectedDate.getFullYear()}}
+          {{selectedValue.getFullYear()}}
           <div class="b3-arrow-dd"></div>
         </button>
       </div>

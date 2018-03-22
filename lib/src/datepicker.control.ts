@@ -16,19 +16,6 @@ import { DatepickerDirective } from './datepicker.directive';
 })
 export class DatepickerControl extends DatepickerDirective {
 
-  //get accessor
-  get value(): Date {
-    return this._value;
-  };
-
-  //set accessor including call the onchange callback
-  set value(v: Date) {
-    if (v !== this._value) {
-      this.writeValue(v);
-      this.onChangeCallback(v);
-    }
-  }
-
   //Set touched on blur
   onBlur() {
     this.onTouchedCallback();

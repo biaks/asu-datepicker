@@ -11,35 +11,19 @@ export class AppComponent implements OnInit {
   // https://medium.com/@maks.zhitlov/reactive-forms-in-angular-2f8abe884f79 - Реактивные формы (Reactive Forms) в Angular 2+
   // http://stepansuvorov.com/blog/2017/07/angular-forms-and-validation/ - Формы и валидация данных в Angular
 
-  myControl1: FormControl = new FormControl(new Date(2016,6-1,6));
-  myControl2: FormControl = new FormControl(new Date(2017,7-1,7));
-  myControl3: FormControl = new FormControl(new Date(2018,8-1,8));
+  formControl1: FormControl = new FormControl(new Date(2011,1-1,1));
+  formControl2: FormControl = new FormControl(new Date(2012,2-1,2));
 
-  date4Value: Date = new Date(2019,9-1,9);
+  date1: Date = new Date(2013,3-1,3);
+  date2: Date = new Date(2014,4-1,4);
+  date3: Date = new Date(2015,5-1,5);
 
-  setDate1() {
-    this.myControl1.setValue (new Date());
-  }
+  setFormControl1() { this.formControl1.setValue (new Date()); }
+  setFormControl2() { this.formControl2.setValue (new Date()); }
 
-  setDate2() {
-    this.myControl2.setValue (new Date());
-  }
-
-  setDate3() {
-    this.myControl3.setValue (new Date());
-  }
-
-  setDate4() {
-    this.date4Value = new Date();
-  }
-
-  date4ValueText: string = "";
-  date4ValueCompleted(event: Date) {
-    if (event != null)
-      this.date4ValueText = "Selected " + event.toLocaleDateString();
-    else
-      this.date4ValueText = "Select canceled";
-  }
+  setDate1() { this.date1 = new Date(); }
+  setDate2() { this.date2 = new Date(); }
+  setDate3() { this.date3 = new Date(); }
 
   ngOnInit(): void {
     console.log("onInit(): run");

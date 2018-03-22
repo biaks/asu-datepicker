@@ -14,28 +14,63 @@ export enum SelectorMode {
 })
 export class DatepickerComponent {
 
-  @Input() set position ({top, left}) { this.setCalendarPos (top, left); }
-  @Input('value') selectedDate: Date               = new Date();
-  @Output()       onCompleted:  EventEmitter<Date> = new EventEmitter<Date>();
+  // пример использования параметра с двухсторонним связыванием:
+
+  // https://angular.io/guide/template-syntax
+  //
+  // варианты указания связывания:
+  //   size  ="myConst" - можно использовать только если:
+  //                      - size может принять текстовое значение
+  //                      - myConst - это константная строка
+  //                      - это инициализированное значение никгда не будет меняться
+  //  [size] ="myProperty"  ->   bind-size="myProperty"  --> это всегда свойство компонента (property)
+  //  (size) ="myExtention" ->     on-size="myExtention" --> есть дефолтный параметр $event, можно его чему-то присвоить или передать в функцию
+  // [(size)]="myProperty"  -> bindon-size="myProperty"
+  //
+  // [(size)]="myProperty"
+  //   @Input ('size')       set setValue(value: number) { this.value = value; }
+  //   @Output('sizeChange') emitter: EventEmitter<number> = new EventEmitter<number>();
+  //
+  // или без переименовывания в Input/Output:
+  // [(size)]="myProperty"
+  //   @Output() sizeChange: EventEmitter<number> = new EventEmitter<number>();
+  //   @Input()  set size(value: number) { this.value = value; }
+  //
+  // или без переименовывания в Input/Output и без сеттера:
+  // [(size)]="myProperty"
+  //   @Output() sizeChange: EventEmitter<number> = new EventEmitter<number>();
+  //   @Input()  size:       number;
+  //
+  // варианты последующего использование
+  // <our-component [(size)]="sizeValue"></our-component>
+  // <our-component [size]="sizeValue" (sizeChange)="sizeValue=$event"></our-component>
+
+  savedValue:    Date = null;// = new Date();
+  selectedValue: Date = new Date();
+
+  @Input()  set value(date: Date) { this.savedValue = date; this.selectedValue = new Date(date); }
+  @Output() valueChange: EventEmitter<Date> = new EventEmitter<Date>();
+  @Output() input:       EventEmitter<Date> = new EventEmitter<Date>();
+
+  ok()     { this.valueChange.emit(this.selectedValue); this.input.emit(this.selectedValue); }
+  cancel() { this.valueChange.emit(this.savedValue);    this.input.emit(this.savedValue);    }
+
+  selectorPosTop:  string = '10px';
+  selectorPosLeft: string = '10px';
+
+  @Input() set position ({top, left}) {
+    this.selectorPosTop  = top  + 'px';
+    this.selectorPosLeft = left + 'px';
+  }
 
   weekDaysNamesShort: Array<string> = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
-  weekDaysNames: Array<string> = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"];
-  monthNames: Array<string> = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+  weekDaysNames:      Array<string> = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"];
+  monthNames:         Array<string> = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+  
   todayDate: Date = new Date();
 
   selectorMode = SelectorMode;
   currentMode: SelectorMode = SelectorMode.days;
-
-  selectorPosTop: string = '10px';
-  selectorPosLeft: string = '10px';
-
-  setCalendarPos (top: number, left: number) {
-    this.selectorPosTop = top + 'px';
-    this.selectorPosLeft = left + 'px';
-  }
-
-  ok()     { this.onCompleted.emit(this.selectedDate); }
-  cancel() { this.onCompleted.emit(null);              }
 
   getYearsList (count: number): number[] {
     let firstYear = this.getStartYear();
@@ -45,30 +80,30 @@ export class DatepickerComponent {
   }
   
   getStartDay() : number {
-    let tmpDate = new Date(this.selectedDate.getFullYear(), this.selectedDate.getMonth(), 1);
+    let tmpDate = new Date(this.selectedValue.getFullYear(), this.selectedValue.getMonth(), 1);
     return -this.correctWeekDay(tmpDate.getDay()) + 1;
   }
   getStartYear(): number {
-    let i: number = this.selectedDate.getFullYear();
+    let i: number = this.selectedValue.getFullYear();
     i = i - (i % 20);
     return i;
   }
   isTodayDay(day: number) : boolean {
-    return (   this.selectedDate.getFullYear() == this.todayDate.getFullYear()
-            && this.selectedDate.getMonth()    == this.todayDate.getMonth()
-            && day                             == this.todayDate.getDate() );
+    return (   this.selectedValue.getFullYear() == this.todayDate.getFullYear()
+            && this.selectedValue.getMonth()    == this.todayDate.getMonth()
+            && day                              == this.todayDate.getDate() );
   }
   isSelectedDay(day: number) : boolean {
-    return (   day                             == this.selectedDate.getDate() );
+    return (   day                             == this.selectedValue.getDate() );
   }
   isSelectedMonth(month: number) {
-    return (   month                           == this.selectedDate.getMonth() );
+    return (   month                           == this.selectedValue.getMonth() );
   }
   isSelectedYear(year: number) {
-    return (   year                            == this.selectedDate.getFullYear() );
+    return (   year                            == this.selectedValue.getFullYear() );
   }
   daysInSelectedMonth (): number {
-    let tmpDate = new Date(this.selectedDate.getFullYear(), this.selectedDate.getMonth()+1, 0);
+    let tmpDate = new Date(this.selectedValue.getFullYear(), this.selectedValue.getMonth()+1, 0);
     return tmpDate.getDate();
   }
   calculateShowingDay(row: number, col: number) :number {
@@ -84,39 +119,39 @@ export class DatepickerComponent {
 
   changeSelectedDay(selectedDay: number) {
     if (this.isValidDay(selectedDay))
-      this.selectedDate.setDate (selectedDay);
+      this.selectedValue.setDate (selectedDay);
   }
   changeSelectedMonth(month: number) {
-    this.selectedDate.setMonth (month);
+    this.selectedValue.setMonth (month);
   }
   changeSelectedYear(year: number) {
-    this.selectedDate.setFullYear (year);
+    this.selectedValue.setFullYear (year);
   }
 
   stepNextDay() {
-    this.selectedDate.setDate(this.selectedDate.getDate()+1);
+    this.selectedValue.setDate(this.selectedValue.getDate()+1);
   }
   stepPrevDay() {
-    this.selectedDate.setDate(this.selectedDate.getDate()-1);
+    this.selectedValue.setDate(this.selectedValue.getDate()-1);
   }
   stepNextMonth() {
-    if (this.selectedDate.getMonth() < 11)
-      this.selectedDate.setMonth(this.selectedDate.getMonth()+1);
+    if (this.selectedValue.getMonth() < 11)
+      this.selectedValue.setMonth(this.selectedValue.getMonth()+1);
   }
   stepPrevMonth() {
-    if (this.selectedDate.getMonth() > 0)
-    this.selectedDate.setMonth(this.selectedDate.getMonth()-1);
+    if (this.selectedValue.getMonth() > 0)
+    this.selectedValue.setMonth(this.selectedValue.getMonth()-1);
   }
   stepNextYear() {
-    this.selectedDate.setFullYear(this.selectedDate.getFullYear()+1);
+    this.selectedValue.setFullYear(this.selectedValue.getFullYear()+1);
   }
   stepPrevYear() {
-    this.selectedDate.setFullYear(this.selectedDate.getFullYear()-1);
+    this.selectedValue.setFullYear(this.selectedValue.getFullYear()-1);
   }
   stepNext20Years() {
-    this.selectedDate.setFullYear(this.selectedDate.getFullYear()+20);
+    this.selectedValue.setFullYear(this.selectedValue.getFullYear()+20);
   }
   stepPrev20Years() {
-    this.selectedDate.setFullYear(this.selectedDate.getFullYear()-20);
+    this.selectedValue.setFullYear(this.selectedValue.getFullYear()-20);
   }
 }

@@ -1,5 +1,6 @@
 
 import { Directive, forwardRef, ElementRef, ViewContainerRef, ComponentFactoryResolver,ComponentRef, HostListener, ComponentFactory } from "@angular/core";
+import { Input, Output, EventEmitter } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { DatepickerComponent } from "./datepicker.component";
 
@@ -20,7 +21,56 @@ import { DatepickerComponent } from "./datepicker.component";
 })
 export class DatepickerDirective implements ControlValueAccessor {
 
+  // пример использования параметра с двухсторонним связыванием:
+
+  // https://angular.io/guide/template-syntax
+  //
+  // варианты указания связывания:
+  //   size  ="myConst" - можно использовать только если:
+  //                      - size может принять текстовое значение
+  //                      - myConst - это константная строка
+  //                      - это инициализированное значение никгда не будет меняться
+  //  [size] ="myProperty"  ->   bind-size="myProperty"  --> это всегда свойство компонента (property)
+  //  (size) ="myExtention" ->     on-size="myExtention" --> есть дефолтный параметр $event, можно его чему-то присвоить или передать в функцию
+  // [(size)]="myProperty"  -> bindon-size="myProperty"
+  //
+  // [(size)]="myProperty"
+  //   @Input ('size')       set setValue(value: number) { this.value = value; }
+  //   @Output('sizeChange') emitter: EventEmitter<number> = new EventEmitter<number>();
+  //
+  // или без переименовывания в Input/Output:
+  // [(size)]="myProperty"
+  //   @Output() sizeChange: EventEmitter<number> = new EventEmitter<number>();
+  //   @Input()  set size(value: number) { this.value = value; }
+  //
+  // или без переименовывания в Input/Output и без сеттера:
+  // [(size)]="myProperty"
+  //   @Output() sizeChange: EventEmitter<number> = new EventEmitter<number>();
+  //   @Input()  size:       number;
+  //
+  // варианты последующего использование
+  // <our-component [(size)]="sizeValue"></our-component>
+  // <our-component [size]="sizeValue" (sizeChange)="sizeValue=$event"></our-component>
+
   _value: Date;
+
+  @Input()  set value(date: Date) {
+    if (this._value != date) {
+      this._value = date;                                               // запишем во внутреннюю переменную
+      this.elem.nativeElement.value = this._value.toLocaleDateString(); // отрисуем значение в представлении
+      this.onChangeCallback(this._value);                               // вызовим событие изменения для reactiveForms
+      this.valueChange.emit(this._value);                              // вызовим событие изменения для двухстороннего связывания [(value)]
+      //this.input.emit(this._value);                                     // вызовим событие изменения как стандартный input (input)
+    }
+  }
+  @Output() valueChange: EventEmitter<Date> = new EventEmitter<Date>();
+  
+  // тут интересная херня - если невозможно прочитать value (нету get value), тогда reactiveForms пытаются ловить стандартное событие input
+  // при этом, это должен быть nativeInputEvent, в котором должно быть поле event.value
+  // вот так не будет работать:
+  //@Output() input:       EventEmitter<Date> = new EventEmitter<Date>();
+  // поэтому для reactiveForms вставим getter, возвращающий значение:
+  get value () { return this._value };
 
   // Для директивы сюда придет ссылка на элемент input, в котором будет указана данная директива
   constructor (
@@ -32,12 +82,14 @@ export class DatepickerDirective implements ControlValueAccessor {
     elem.nativeElement.readOnly = true;
   }
 
-  private calendarRef: ComponentRef<DatepickerComponent> = null;
+  // ниже отображение календаря (компонент DatepickerComponent)
 
   @HostListener("click") onMouseClick() {
     if (this.calendarRef == null)
       this.showCalendar();
   }
+
+  private calendarRef: ComponentRef<DatepickerComponent> = null;
 
   showCalendar() {
     
@@ -54,7 +106,7 @@ export class DatepickerDirective implements ControlValueAccessor {
     // переместим компонент в body (чтобы не него не влияли текущие css стили)
     document.querySelector("body").appendChild(this.calendarRef.location.nativeElement);
     // инициализируем дату в календаре
-    this.calendarRef.instance.selectedDate = new Date(this._value);
+    this.calendarRef.instance.value = new Date(this._value);
 
     // посчитаем координаты для отображения календаря
     let top: number , left: number;
@@ -65,29 +117,22 @@ export class DatepickerDirective implements ControlValueAccessor {
     top  = +19 + e.top  - b.top  + this.elem.nativeElement.offsetHeight;
     left = -39 + e.left - b.left; // + this.elem.nativeElement.offsetWidth;
 
-    this.calendarRef.instance.setCalendarPos (top, left);
+    this.calendarRef.instance.position = {top, left};
 
     // подпишемся на событие завершения выбора даты
-    this.calendarRef.instance.onCompleted.subscribe(
-      (result:boolean) => {
-        if (result) {
-          if (this.calendarRef.instance.selectedDate != this._value) {
-            this.writeValue(this.calendarRef.instance.selectedDate);
-            this.onChangeCallback(this.calendarRef.instance.selectedDate);
-          }
-        }
+    this.calendarRef.instance.valueChange.subscribe(
+      ( event: Date ) => {
+        this.value = event;
         this.calendarRef.destroy();
         this.calendarRef = null;
       }
     )
   }
 
-  // всё, что далее - это реализация интерфейса ControlValueAccessor
+  // ниже реализация интерфейса ControlValueAccessor
 
   writeValue(date: Date): void {
-    console.log("writeValue() <- ", date.toJSON());
-    this._value = date;
-    this.elem.nativeElement.value = date.toLocaleDateString();
+    this.value = date;
   }
 
   // Function to call when the rating changes.
