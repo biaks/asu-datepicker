@@ -4,16 +4,13 @@
   "license": "MIT",
   "scripts": {
     "lint": "ng lint",
-    "ng":   "ng",
-
+    "ng": "ng",
     "start": "npm run start:demo-flat",
     "build": "npm run build:package",
-
-    "start:demo-flat":        "ng serve --aot --app demo-flat",
+    "start:demo-flat": "ng serve --aot --app demo-flat",
     "start:demo-use-package": "ng serve --aot --app demo-use-package",
-    "build:demo-flat":        "ng build --aot --app demo-flat",
+    "build:demo-flat": "ng build --aot --app demo-flat",
     "build:demo-use-package": "ng build --aot --app demo-use-package",
-
     "build:package": "ng-packagr -p lib/package.json",
     "publish:local": "cd ../../ && npm install libs/asu-datepicker/dist/package"
   },
