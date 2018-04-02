@@ -53,13 +53,35 @@ export class DatepickerDirective implements ControlValueAccessor {
   // <our-component [size]="sizeValue" (sizeChange)="sizeValue=$event"></our-component>
 
   _value: Date;
+  valueIsDate: boolean = true;
+  valueIsEmpty: boolean = false;
+
+  pad (num: number, size: number) {
+    let s = num + "";
+    while (s.length < size) s = "0" + s;
+    return s;
+  }
 
   @Input()  set value(date: Date) {
     if (this._value != date) {
       this._value = date;                                               // запишем во внутреннюю переменную
-      this.elem.nativeElement.value = this._value.toLocaleDateString(); // отрисуем значение в представлении
-      this.onChangeCallback(this._value);                               // вызовим событие изменения для reactiveForms
-      this.valueChange.emit(this._value);                              // вызовим событие изменения для двухстороннего связывания [(value)]
+
+      if (this.valueIsEmpty)
+        this.elem.nativeElement.value = ""; // отрисуем значение в представлении
+      else
+        this.elem.nativeElement.value = this._value.getFullYear() + '-' + this.pad(this._value.getMonth()+1,2) + '-' + this.pad(this._value.getDate(),2); // отрисуем значение в представлении
+        
+      if (this.valueIsDate) {
+        console.log ("datepicker::set value("+date.toLocaleString()+")");    
+        this.onChangeCallback(this._value);                               // вызовем событие изменения для reactiveForms
+      }
+      else {
+        if (this.valueIsEmpty == false) {
+          console.log ("datepicker::set value("+date.toISOString().substr(0,10)+")");    
+          this.onChangeCallback(this._value.toISOString().substr(0,10));    // вызовем событие изменения для reactiveForms
+        }
+      }
+      this.valueChange.emit(this._value);                              // вызовем событие изменения для двухстороннего связывания [(value)]
       //this.input.emit(this._value);                                     // вызовим событие изменения как стандартный input (input)
     }
   }
@@ -122,6 +144,8 @@ export class DatepickerDirective implements ControlValueAccessor {
     // подпишемся на событие завершения выбора даты
     this.calendarRef.instance.valueChange.subscribe(
       ( event: Date ) => {
+        if (this.valueIsEmpty && this._value != event)
+          this.valueIsEmpty = false;
         this.value = event;
         this.calendarRef.destroy();
         this.calendarRef = null;
@@ -131,16 +155,37 @@ export class DatepickerDirective implements ControlValueAccessor {
 
   // ниже реализация интерфейса ControlValueAccessor
 
-  writeValue(date: Date): void {
-    this.value = date;
+  writeValue(date: Date | string): void {
+
+    if (date instanceof Date) {
+      console.log ("datepicker::writeValue(\""+date.toLocaleString()+"\":Date)");
+      this.valueIsDate = true;
+      this.valueIsEmpty = false;
+      this.value = new Date(date);
+    }
+
+    if (typeof date === "string") {
+      this.valueIsDate = false;
+      if (date == "") {
+        console.log ("datepicker::writeValue(emptyValue:string)");
+        this.valueIsEmpty = true;
+        this.value = new Date();
+      }
+      else {
+        console.log ("datepicker::writeValue(\""+date.toLocaleString()+"\":string)");
+        this.valueIsEmpty = false;
+        this.value = new Date(date);
+      }
+    }
+    
   }
 
   // Function to call when the rating changes.
-  onChangeCallback = (value: Date) => {};
+  onChangeCallback = (value: Date | string) => {};
 
   // Allows Angular to register a function to call when the model (rating) changes.
   // Save the function as a property to call later here.
-  registerOnChange(fn: (value: Date) => void): void {
+  registerOnChange(fn: (value: Date | string) => void): void {
     this.onChangeCallback = fn;
   }
 
