@@ -62,6 +62,7 @@ export class DatepickerDirective implements ControlValueAccessor {
   // <our-component [size]="sizeValue" (sizeChange)="sizeValue=$event"></our-component>
 
   private get _rawValue(){ return this.elem.nativeElement.value; }
+  private _rawInitValue:any;
   _initDateValue: Date;
   _isNativeDate: boolean = false;
 
@@ -136,8 +137,8 @@ export class DatepickerDirective implements ControlValueAccessor {
     // переместим компонент в body (чтобы не него не влияли текущие css стили)
     //document.querySelector("body").appendChild(this.calendarRef.location.nativeElement);
 
-    // this._rawValue = this.elem.nativeElement.value;
-    this._initDateValue = this._isNativeDate ? this._rawValue : this.getParsedDate(this._rawValue);
+    this._rawInitValue = this.elem.nativeElement.value;
+    this._initDateValue = this._isNativeDate ? this._rawInitValue : this.getParsedDate(this._rawInitValue);
 
     // инициализируем дату в календаре
     this.calendarRef.instance.value = this._initDateValue;
@@ -171,7 +172,7 @@ export class DatepickerDirective implements ControlValueAccessor {
               break;
             case DatapickerResultTypes.Cancel:
               datapickerSubscription.unsubscribe();
-              value = this._rawValue;
+              value = this._rawInitValue;
               this.destroyDatapicker();
               break;
           }
