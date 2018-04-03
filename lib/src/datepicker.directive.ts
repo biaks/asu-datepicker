@@ -134,7 +134,7 @@ export class DatepickerDirective implements ControlValueAccessor {
     // создадим компонент (автоматом вставляется в DOM после текущего компонента)
     this.calendarRef = this.vcRef.createComponent(cf);
     // переместим компонент в body (чтобы не него не влияли текущие css стили)
-    document.querySelector("body").appendChild(this.calendarRef.location.nativeElement);
+    //document.querySelector("body").appendChild(this.calendarRef.location.nativeElement);
 
     // this._rawValue = this.elem.nativeElement.value;
     this._initDateValue = this._isNativeDate ? this._rawValue : this.getParsedDate(this._rawValue);
@@ -144,15 +144,15 @@ export class DatepickerDirective implements ControlValueAccessor {
     this.calendarRef.instance.useNativeDate = this._isNativeDate;
 
     // посчитаем координаты для отображения календаря
-    let top: number , left: number;
+    //let top: number , left: number;
 
-    let b: ClientRect = document.body.getBoundingClientRect();
-    let e: ClientRect = this.elem.nativeElement.getBoundingClientRect();
+    //let b: ClientRect = document.body.getBoundingClientRect();
+    //let e: ClientRect = this.elem.nativeElement.getBoundingClientRect();
 
-    top  = +19 + e.top  - b.top  + this.elem.nativeElement.offsetHeight;
-    left = -39 + e.left - b.left; // + this.elem.nativeElement.offsetWidth;
+    //top  = +19 + e.top  - b.top  + this.elem.nativeElement.offsetHeight;
+    //left = -39 + e.left - b.left; // + this.elem.nativeElement.offsetWidth;
 
-    this.calendarRef.instance.position = {top, left};
+    //this.calendarRef.instance.position = {top, left};
 
     // подпишемся на событие завершения выбора даты
     let datapickerSubscription:Subscription;

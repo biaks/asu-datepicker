@@ -2,7 +2,8 @@
 <!-- https://metanit.com/web/angular2/3.5.php - Структурные директивы ngIf, ngFor, ngSwitch -->
 <!-- https://www.concretepage.com/angular-2/angular-2-ngswitch-example - Angular 2 NgSwitch Example -->
 
-<div class="b3-datepicker__content" [ngStyle]="{'top': selectorPosTop, 'left': selectorPosLeft}" [ngSwitch]="currentMode">
+<!-- <div class="b3-datepicker__content" [ngStyle]="{'top': selectorPosTop, 'left': selectorPosLeft}" [ngSwitch]="currentMode"> -->
+<div class="b3-datepicker__content" [ngSwitch]="currentMode" style="display:block">
 
   <div class="b3-calendar" *ngSwitchCase="selectorMode.years">
     <div class="b3-calendar__header">
