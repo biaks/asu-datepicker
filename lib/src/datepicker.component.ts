@@ -135,11 +135,11 @@ export class DatepickerComponent {
     return row*7 + col + this.getStartDay()
   }
   isValidDay(day: number): boolean {
-    return day > 0 && day <= this.daysInSelectedMonth();
+    return day > 0 && day <= (this.daysInSelectedMonth()+1);
   }
   correctWeekDay(weekDay: number): number {
     if (weekDay == 0) weekDay = 7; // поправим воскресенье
-    return weekDay-1; 
+    return weekDay; 
   }
 
   changeSelectedDay(selectedDay: number) {
