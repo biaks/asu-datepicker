@@ -5,14 +5,13 @@
   "scripts": {
     "lint": "ng lint",
     "ng": "ng",
-    "start": "npm run start:demo-flat",
-    "build": "npm run build:package",
+    "start": "yarn start:demo-flat",
+    "build": "yarn build:package",
     "start:demo-flat": "ng serve --aot --app demo-flat",
     "start:demo-use-package": "ng serve --aot --app demo-use-package",
     "build:demo-flat": "ng build --aot --app demo-flat",
     "build:demo-use-package": "ng build --aot --app demo-use-package",
-    "build:package": "ng-packagr -p lib/package.json",
-    "publish:local": "cd ../../ && npm install libs/asu-datepicker/dist/package"
+    "build:package": "ng-packagr -p lib/package.json"
   },
   "private": true,
   "dependencies": {
@@ -24,7 +23,7 @@
     "@angular/platform-browser": "^5.2.8",
     "@angular/platform-browser-dynamic": "^5.2.8",
     "@angular/router": "^5.2.8",
-    "asu-guide": "file:../asu-guide/dist",
+    "asu-guide": "file:../asu-guide",
     "core-js": "^2.5.3",
     "mkdir": "0.0.2",
     "ncp": "^2.0.0",
@@ -37,6 +36,6 @@
     "@angular/compiler-cli": "^5.2.8",
     "@angular/language-service": "^5.2.8",
     "ng-packagr": "^2.2.0",
-    "typescript": "^2.6.2"
+    "typescript": "^2.7.0"
   }
 }
