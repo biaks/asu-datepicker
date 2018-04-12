@@ -5,9 +5,15 @@
   "scripts": {
     "lint": "ng lint",
     "ng": "ng",
+<<<<<<< HEAD
     "start": "npm run start:demo-flat",
     "build": "npm run build:package",
     "start:demo-flat": "ng serve --aot --app demo-flat",
+=======
+    "start": "yarn start:demo-flat",
+    "build": "yarn build:package",
+    "start:demo-flat": "ng serve --aot --app demo-flat --port 4300",
+>>>>>>> e14a6fb... Полностью переписал логику работы datepicker ))
     "start:demo-use-package": "ng serve --aot --app demo-use-package",
     "build:demo-flat": "ng build --aot --app demo-flat",
     "build:demo-use-package": "ng build --aot --app demo-use-package",

@@ -4,6 +4,24 @@
 <table>
   <tr><td>
 
+    <p>0. Встраивание через директиву ngx-datepicker и привязка [formControl]="formControl"</p>
+    <div class="b3-schedule">
+      <label class="b3-input-group__label b3-input-group__label--static">Дата договора</label>
+      <!--<span class="icon icon_calendar-empty"></span>-->
+      <input ngx-datepicker class="b3-input-group__field"
+        [name]="field_key0"
+        [formControl]="formControl0"
+        [id]="field_key0"
+        (keyup)="checkEmit0('keyup')"
+        (focus)="checkEmit0('focus')"
+        (focusout)="checkEmit0('focusout')"
+      >
+    </div>
+    <br/>
+    <button type="button" (click)="setFormControl0()">Set Today</button>
+    <p>Значение {{formControl0.value}}</p>
+
+    <br/>
     <p>1. Встраивание через директиву ngx-datepicker и привязка [formControl]="formControl"</p>
     <div class="b3-ws-header__date">
      <div class="b3-datepicker undefined">
@@ -18,7 +36,7 @@
     </div>
     <br/>
     <button type="button" (click)="setFormControl1()">Set Today</button>
-    <p>Значение {{formControl1.value.toLocaleDateString()}}</p>
+    <p>Значение {{formControl1.value}}</p>
 
     <br/>
     <p>2. Встраивание через директиву ngx-datepicker и двухстороннее связывание через [(value)]="value"</p>
@@ -35,7 +53,7 @@
     </div>
     <br/>
     <button type="button" (click)="setDate1()">Set Today</button>
-    <p>Значение {{date1.toLocaleDateString()}}</p>
+    <p>Значение {{date1}}</p>
 
     <br/>
     <p>Использование компонента app-datepicker-input и привязка [formControl]="formControl"</p>
@@ -52,7 +70,7 @@
     </div>
     <br/>
     <button type="button" (click)="setFormControl2()">Set Today</button>
-    <p>Значение {{formControl2.value.toLocaleDateString()}}</p>
+    <p>Значение {{formControl2.value}}</p>
 
     <br/>
     <p>Использование компонента app-datepicker-input и двухстороннее связывание через [(value)]="value"</p>
@@ -69,7 +87,7 @@
     </div>
     <br/>
     <button type="button" (click)="setDate2()">Set Today</button>
-    <p>Значение {{date2.toLocaleDateString()}}</p>
+    <p>Значение {{date2}}</p>
 
   </td>
   <td width="200"></td>

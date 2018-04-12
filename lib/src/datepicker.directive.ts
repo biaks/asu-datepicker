@@ -51,48 +51,116 @@ export class DatepickerDirective implements ControlValueAccessor {
   // варианты последующего использование
   // <our-component [(size)]="sizeValue"></our-component>
   // <our-component [size]="sizeValue" (sizeChange)="sizeValue=$event"></our-component>
-
+  inputDateInString: boolean = false;
   _value: Date;
-  valueIsDate: boolean = true;
-  valueIsEmpty: boolean = false;
 
-  pad (num: number, size: number) {
-    let s = num + "";
-    while (s.length < size) s = "0" + s;
-    return s;
+  // на вход может приходить:
+  // пустая строка ""
+  // строка с датой вида "DD.MM.YYYY"
+  // null - считаем это пустой датой в формате Date
+  // Date
+  @Input() set value (newValue: string|Date) {
+
+    console.log ("datepicker::set value => " + newValue);
+
+    if (typeof newValue == "object") this.inputDateInString = false;
+    else                             this.inputDateInString = true;
+
+    this.tryToEmitChange (newValue);
   }
-
-  @Input()  set value(date: Date) {
-    if (this._value != date) {
-      this._value = date;                                               // запишем во внутреннюю переменную
-
-      if (this.valueIsEmpty)
-        this.elem.nativeElement.value = ""; // отрисуем значение в представлении
-      else
-        this.elem.nativeElement.value = this._value.getFullYear() + '-' + this.pad(this._value.getMonth()+1,2) + '-' + this.pad(this._value.getDate(),2); // отрисуем значение в представлении
-        
-      if (this.valueIsDate) {
-        console.log ("datepicker::set value("+date.toLocaleString()+")");    
-        this.onChangeCallback(this._value);                               // вызовем событие изменения для reactiveForms
+  @Output() valueChange: EventEmitter<string|Date> = new EventEmitter<string|Date>();
+  
+  tryToEmitChange (newValue: string|Date) {
+    this.setNativeElementValue (newValue);
+    let newDateValue = this.getDateValue(newValue);
+    console.log ("datepicker::tryToEmitChange("+newValue+") => " + 'saved:' + this._value +' transf:'+ newDateValue);
+    if (this._value !== newDateValue) {
+      this._value = newDateValue;
+      if (this.inputDateInString) {
+        this.onChangeCallback(this.date2string(this._value)); // вызовим событие изменения для reactiveForms
+        this.valueChange.emit(this.date2string(this._value)); // вызовим событие изменения для двухстороннего связывания [(value)]
       }
       else {
-        if (this.valueIsEmpty == false) {
-          console.log ("datepicker::set value("+date.toISOString().substr(0,10)+")");    
-          this.onChangeCallback(this._value.toISOString().substr(0,10));    // вызовем событие изменения для reactiveForms
-        }
+        this.onChangeCallback(this._value); // вызовим событие изменения для reactiveForms
+        this.valueChange.emit(this._value); // вызовим событие изменения для двухстороннего связывания [(value)]
       }
-      this.valueChange.emit(this._value);                              // вызовем событие изменения для двухстороннего связывания [(value)]
-      //this.input.emit(this._value);                                     // вызовим событие изменения как стандартный input (input)
     }
   }
-  @Output() valueChange: EventEmitter<Date> = new EventEmitter<Date>();
+
+  getDateValue (value: string|Date): Date {
+    if (typeof value == "object") return value;
+    else                          return this.string2date(value);
+  }
+
+  string2date (rawValue: string): Date {
+
+    if (rawValue.length != 10) {
+      console.log ("datepicker::string2date("+rawValue+") => error length");
+      return null;
+    }
+
+    if (/^\d{4}-\d{2}-\d{2}$/.test(rawValue) == false) {
+      console.log ("datepicker::string2date("+rawValue+") => error format YYYY-MM-DD");
+      return null;
+    }
+
+    let year  = parseInt(rawValue.substr(0,4));
+    let month = parseInt(rawValue.substr(5,2));
+    let day   = parseInt(rawValue.substr(8,2));
+    
+    if (year < 1900 || year > 2100 || month == 0 || month > 12 || day == 0 || day > 31) {
+      console.log ("datepicker::string2date("+rawValue+") => error min max values");
+      return null;
+    }
+
+    let date = new Date(year, month-1, day);
+    //console.log ("datepicker::string2date("+rawValue+") =>" + date);
+    return date;
+
+  }
+
+  setNativeElementValue (value: string|Date) {
+    if (typeof value == "object") this.elem.nativeElement.value = this.date2string(value);
+    else                          this.elem.nativeElement.value = value;
+  }
   
+  To2 (val: number): string {
+    return (val<10 ? "0"+val.toString() : val.toString());
+  }
+
+  date2string(date: Date): string {
+    if (date) {
+      let result = date.getFullYear() +'-'+ this.To2(date.getMonth()+1) +'-'+ this.To2(date.getDate());
+      //console.log ("datepicker::date2string("+date+") => " + result);
+      return result;
+    }
+    else return "";
+  }
+
+  private destroyCalendar() {
+    if (this.calendarRef) {
+      this.calendarRef.destroy();
+      this.calendarRef = null;
+    }
+  }
+
+  private isValidDate( date:any ){
+    if( Object.prototype.toString.call(date) === "[object Date]" ){
+      if( isNaN(date.getTime()) ) return false
+      else return true
+    }
+    else return false;
+  }
+
   // тут интересная херня - если невозможно прочитать value (нету get value), тогда reactiveForms пытаются ловить стандартное событие input
   // при этом, это должен быть nativeInputEvent, в котором должно быть поле event.value
   // вот так не будет работать:
   //@Output() input:       EventEmitter<Date> = new EventEmitter<Date>();
   // поэтому для reactiveForms вставим getter, возвращающий значение:
-  get value () { return this._value };
+  get value (): string|Date {
+    if (this.inputDateInString) return this.date2string(this._value);
+    else                        return this._value;
+  };
 
   // Для директивы сюда придет ссылка на элемент input, в котором будет указана данная директива
   constructor (
@@ -101,20 +169,37 @@ export class DatepickerDirective implements ControlValueAccessor {
     private cfr: ComponentFactoryResolver // с помощью этого найдем фабрику для компонента клендаря
                                           // (компонент календаря должен быть указан в module:entryComponents)
   ) {
-    elem.nativeElement.readOnly = true;
+    // elem.nativeElement.readOnly = true;
+  }
+  ngOnInit(){
   }
 
   // ниже отображение календаря (компонент DatepickerComponent)
 
   @HostListener("click") onMouseClick() {
-    if (this.calendarRef == null)
-      this.showCalendar();
+    console.log ("datepicker::onMouseClick()");
+    if (this.calendarRef) this.destroyCalendar();
+    else                  this.showCalendar();
+  }
+//  @HostListener("focus") onFocus() {
+//    console.log ("datepicker::onFocus()");
+//    this.showCalendar();
+//  }
+  @HostListener("keyup", ['$event']) onKeyup(event) {
+    let rawValue = event.target.value;
+    console.log ("datepicker::onKeyup("+JSON.stringify(rawValue)+")");
+    this.destroyCalendar();
+    this.tryToEmitChange (rawValue);
   }
 
   private calendarRef: ComponentRef<DatepickerComponent> = null;
 
   showCalendar() {
-    
+
+    if (this.calendarRef) return;
+
+    console.log ("datepicker::showCalendar()");
+
     // https://habrahabr.ru/company/infowatch/blog/330030 - Динамический Angular или манипулируй правильно
     // https://angular.io/guide/dynamic-component-loader - Dynamic Component Loader
     // https://www.concretepage.com/angular-2/angular-2-4-dynamic-component-loader-example - Angular 2/4 Dynamic Component Loader Example
@@ -125,59 +210,33 @@ export class DatepickerDirective implements ControlValueAccessor {
     let cf: ComponentFactory<DatepickerComponent> = this.cfr.resolveComponentFactory(DatepickerComponent);
     // создадим компонент (автоматом вставляется в DOM после текущего компонента)
     this.calendarRef = this.vcRef.createComponent(cf);
-    // переместим компонент в body (чтобы не него не влияли текущие css стили)
-    document.querySelector("body").appendChild(this.calendarRef.location.nativeElement);
+
     // инициализируем дату в календаре
-    this.calendarRef.instance.value = new Date(this._value);
-
-    // посчитаем координаты для отображения календаря
-    let top: number , left: number;
-
-    let b: ClientRect = document.body.getBoundingClientRect();
-    let e: ClientRect = this.elem.nativeElement.getBoundingClientRect();
-
-    top  = +19 + e.top  - b.top  + this.elem.nativeElement.offsetHeight;
-    left = -39 + e.left - b.left; // + this.elem.nativeElement.offsetWidth;
-
-    this.calendarRef.instance.position = {top, left};
+    this.calendarRef.instance.value = this._value;
 
     // подпишемся на событие завершения выбора даты
     this.calendarRef.instance.valueChange.subscribe(
-      ( event: Date ) => {
-        if (this.valueIsEmpty && this._value != event)
-          this.valueIsEmpty = false;
-        this.value = event;
-        this.calendarRef.destroy();
-        this.calendarRef = null;
+      ( newValue: Date ) => {
+        console.log ("datepicker::valueChange => "+event.toLocaleString());
+        this.tryToEmitChange (newValue);
       }
     )
+
+    this.calendarRef.instance.onMouseLeave.subscribe(
+      ( newValue: Date ) => {
+        console.log ("datepicker::onMouseLeave => "+event.toLocaleString());
+        this.tryToEmitChange (newValue);
+        this.destroyCalendar();
+      }
+    )
+
   }
 
   // ниже реализация интерфейса ControlValueAccessor
 
-  writeValue(date: Date | string): void {
-
-    if (date instanceof Date) {
-      console.log ("datepicker::writeValue(\""+date.toLocaleString()+"\":Date)");
-      this.valueIsDate = true;
-      this.valueIsEmpty = false;
-      this.value = new Date(date);
-    }
-
-    if (typeof date === "string") {
-      this.valueIsDate = false;
-      if (date == "") {
-        console.log ("datepicker::writeValue(emptyValue:string)");
-        this.valueIsEmpty = true;
-        this.value = new Date();
-      }
-      else {
-        console.log ("datepicker::writeValue(\""+date.toLocaleString()+"\":string)");
-        this.valueIsEmpty = false;
-        this.value = new Date(date);
-      }
-    }
-    
+  writeValue( date:string|Date ): void {
+    console.log('datepicker::writeValue ('+date+')', {date})
+    this.value = date;
   }
 
   // Function to call when the rating changes.

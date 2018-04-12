@@ -5,7 +5,7 @@ import { DatepickerDirective } from './datepicker.directive';
 
 @Component({
   selector: 'app-datepicker-input',
-  template: `{{_value.toLocaleDateString()}}`,
+  template: `{{date2string(_value)}}`,
   styles: [],
   providers: [{
     provide: NG_VALUE_ACCESSOR,

@@ -1,11 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-
-export enum SelectorMode {
-  days,
-  months,
-  years 
-};
+import { Component, Input, Output, EventEmitter, HostListener } from '@angular/core';
 
 @Component({
   selector: 'app-datepicker',
@@ -45,66 +39,92 @@ export class DatepickerComponent {
   // <our-component [(size)]="sizeValue"></our-component>
   // <our-component [size]="sizeValue" (sizeChange)="sizeValue=$event"></our-component>
 
-  savedValue:    Date = null;// = new Date();
-  selectedValue: Date = new Date();
+  _value: Date = null;
+  @Input()  set value (newValue: Date) {
+    console.log('calendar:set value('+newValue+')');
+    this._value = newValue;
+    if (newValue != null) {
+      this.currentYear = newValue.getFullYear();
+      this.currentMonth = newValue.getMonth();
+    }
+    else {
+      this.currentYear = this.todayDate.getFullYear();
+      this.currentMonth = this.todayDate.getMonth();
+    }
+  }
+  get value (): Date { return this._value; }
+  @Output() valueChange:  EventEmitter<Date> = new EventEmitter<Date>();
+  @Output() onMouseLeave: EventEmitter<Date> = new EventEmitter<Date>();
+  @HostListener("mouseleave") _onMouseLeave() { this.onMouseLeave.emit(this.value); }
 
-  @Input()  set value(date: Date) { this.savedValue = date; this.selectedValue = new Date(date); }
-  @Output() valueChange: EventEmitter<Date> = new EventEmitter<Date>();
-  @Output() input:       EventEmitter<Date> = new EventEmitter<Date>();
-
-  ok()     { this.valueChange.emit(this.selectedValue); this.input.emit(this.selectedValue); }
-  cancel() { this.valueChange.emit(this.savedValue);    this.input.emit(this.savedValue);    }
-
-  selectorPosTop:  string = '10px';
-  selectorPosLeft: string = '10px';
-
-  @Input() set position ({top, left}) {
-    this.selectorPosTop  = top  + 'px';
-    this.selectorPosLeft = left + 'px';
+  clear() {
+    this.value = null;
   }
 
   weekDaysNamesShort: Array<string> = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
   weekDaysNames:      Array<string> = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"];
   monthNames:         Array<string> = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
   
-  todayDate: Date = new Date();
+  todayDate:    Date   = new Date();
+  currentYear:  number = this.todayDate.getFullYear();
+  currentMonth: number = this.todayDate.getMonth();
+  
+  currentMode: string = "days"; // can be: days, months, years
 
-  selectorMode = SelectorMode;
-  currentMode: SelectorMode = SelectorMode.days;
+  getSelectedDayText(): string {
+    if (this.value) return this.value.getDate().toString();
+    else            return "";
+  }
+  getSelectedMonthText(): string {
+    if (this.value) return this.monthNames[this.value.getMonth()];
+    else            return "";
+  }
+  getSelectedFullYearText(): string {
+    if (this.value) return this.value.getFullYear().toString();
+    else            return "";
+  }
 
-  getYearsList (count: number): number[] {
+  //getSelectedWeekDayName(): string {
+  //  if (this.value) return this.weekDaysNames[this.correctWeekDay(this.value.getDay())];
+  //  else            return "";
+  //}
+
+  getYearsList (): number[] {
     let firstYear = this.getStartYear();
     let years = [];
-    for ( let i=0; i < count; i++ ) years.push( firstYear+i );
+    for ( let i = 0; i < 20; i++ ) years.push( firstYear+i );
     return years;
   }
   
   getStartDay() : number {
-    let tmpDate = new Date(this.selectedValue.getFullYear(), this.selectedValue.getMonth(), 1);
+    let tmpDate = new Date(this.currentYear, this.currentMonth, 1);
     return -this.correctWeekDay(tmpDate.getDay()) + 1;
   }
   getStartYear(): number {
-    let i: number = this.selectedValue.getFullYear();
+    let i: number = this.currentYear;
     i = i - (i % 20);
     return i;
   }
   isTodayDay(day: number) : boolean {
-    return (   this.selectedValue.getFullYear() == this.todayDate.getFullYear()
-            && this.selectedValue.getMonth()    == this.todayDate.getMonth()
-            && day                              == this.todayDate.getDate() );
+    return (   this.currentYear  == this.todayDate.getFullYear()
+            && this.currentMonth == this.todayDate.getMonth()
+            && day               == this.todayDate.getDate() );
   }
   isSelectedDay(day: number) : boolean {
-    return (   day                             == this.selectedValue.getDate() );
+    if (this.value == null) return false;
+    return (   this.currentYear  == this.value.getFullYear()
+            && this.currentMonth == this.value.getMonth()
+            && day               == this.value.getDate() );
   }
-  isSelectedMonth(month: number) {
-    return (   month                           == this.selectedValue.getMonth() );
+  isCurrentMonth(month: number) {
+    return ( month == this.currentMonth );
   }
-  isSelectedYear(year: number) {
-    return (   year                            == this.selectedValue.getFullYear() );
+  isCurrentYear(year: number) {
+    return ( year  == this.currentYear );
   }
   daysInSelectedMonth (): number {
-    let tmpDate = new Date(this.selectedValue.getFullYear(), this.selectedValue.getMonth()+1, 0);
-    return tmpDate.getDate();
+    let tmpDate = new Date(this.currentYear, this.currentMonth+1, 0);
+    return tmpDate.getUTCDate();
   }
   calculateShowingDay(row: number, col: number) :number {
     return row*7 + col + this.getStartDay()
@@ -117,41 +137,68 @@ export class DatepickerComponent {
     return weekDay-1; 
   }
 
-  changeSelectedDay(selectedDay: number) {
-    if (this.isValidDay(selectedDay))
-      this.selectedValue.setDate (selectedDay);
+  selectTodayDay () {
+    this.value = new Date();
+    this.currentMonth = this.value.getMonth();
+    this.currentYear = this.value.getUTCFullYear();
+    this.valueChange.emit(this.value);
   }
-  changeSelectedMonth(month: number) {
-    this.selectedValue.setMonth (month);
+
+  changeDay(selectedDay: number) {
+    if (this.isValidDay(selectedDay)) {
+      let tmpDate = new Date(this.currentYear, this.currentMonth, selectedDay);
+      if (   this.value
+          && this.value.getDate()     == selectedDay
+          && this.value.getFullYear() == this.currentYear
+          && this.value.getMonth()    == this.currentMonth ) {
+        this._value = null;
+      }
+      else {
+        this.value = tmpDate;
+      }
+      this.valueChange.emit(this.value);
+    }
   }
-  changeSelectedYear(year: number) {
-    this.selectedValue.setFullYear (year);
+  changeCurrentMonth(month: number) {
+    this.currentMonth = month;
+  }
+  changeCurrentYear(year: number) {
+    this.currentYear = year;
   }
 
   stepNextDay() {
-    this.selectedValue.setDate(this.selectedValue.getDate()+1);
+    if (this.value) {
+      this.value.setDate(this.value.getDate()+1);
+      this.valueChange.emit(this.value);
+    }
   }
   stepPrevDay() {
-    this.selectedValue.setDate(this.selectedValue.getDate()-1);
+    if (this.value) {
+      this.value.setDate(this.value.getDate()-1);
+      this.valueChange.emit(this.value);
+    }
   }
   stepNextMonth() {
-    if (this.selectedValue.getMonth() < 11)
-      this.selectedValue.setMonth(this.selectedValue.getMonth()+1);
+    if (this.currentMonth < 11) {
+      this.currentMonth++;
+    }
   }
   stepPrevMonth() {
-    if (this.selectedValue.getMonth() > 0)
-    this.selectedValue.setMonth(this.selectedValue.getMonth()-1);
+    if (this.currentMonth > 0) {
+      this.currentMonth--;
+    }
   }
   stepNextYear() {
-    this.selectedValue.setFullYear(this.selectedValue.getFullYear()+1);
+    this.currentYear++;
   }
   stepPrevYear() {
-    this.selectedValue.setFullYear(this.selectedValue.getFullYear()-1);
+    this.currentYear--;
   }
   stepNext20Years() {
-    this.selectedValue.setFullYear(this.selectedValue.getFullYear()+20);
+    this.currentYear += 20;
   }
   stepPrev20Years() {
-    this.selectedValue.setFullYear(this.selectedValue.getFullYear()-20);
+    this.currentYear -= 20;
   }
+
 }

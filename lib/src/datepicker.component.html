@@ -4,13 +4,13 @@
 
 <div class="b3-datepicker__content" [ngStyle]="{'top': selectorPosTop, 'left': selectorPosLeft}" [ngSwitch]="currentMode">
 
-  <div class="b3-calendar" *ngSwitchCase="selectorMode.years">
+  <div class="b3-calendar" *ngSwitchCase="'years'">
     <div class="b3-calendar__header">
       <button class="b3-calendar__btn b3-calendar__btn_prev"
       (click)="stepPrevYear()"><span class="icon icon_chevron-left"></span></button>
       <div class="b3-calendar__header__control-content">
         <button class="b3-calendar__btn b3-calendar__btn_year">
-          {{selectedValue.getFullYear()}}
+          {{currentYear}}
         </button>
       </div>
       <button class="b3-calendar__btn b3-calendar__btn_next"
@@ -18,7 +18,7 @@
     </div>
     <div class="b3-calendar__content">
       <div class="b3-calendar__content__control-content"></div>
-      <div class="b3-calendar__year">
+      <div class="b3-calendar__year" style="white-space:normal">
         <div class="b3-calendar__year-control">
           <button class="b3-calendar__btn b3-calendar__btn_prev"
           (click)="stepPrev20Years()"><span class="icon icon_chevron-left"></span></button>
@@ -26,11 +26,11 @@
           (click)="stepNext20Years()"><span class="icon icon_chevron-right"></span></button>
         </div>
         <ul class="b3-calendar__year-list">
-          <li *ngFor="let index of [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19];" class="b3-calendar__year-list__item"
-            (click)="changeSelectedYear(getStartYear()+index); currentMode = selectorMode.days"
-            [ngClass]="{'b3-calendar__year_selected': isSelectedYear(getStartYear()+index) }">
+          <li *ngFor="let index of getYearsList();" class="b3-calendar__year-list__item"
+            (click)="changeCurrentYear(index); currentMode = 'days'"
+            [ngClass]="{'b3-calendar__year_selected': isCurrentYear(index) }">
             <span>
-              {{getStartYear()+index}}
+              {{index}}
             </span>
           </li>
         </ul>
@@ -38,7 +38,7 @@
     </div>
   </div>
 
-  <div class="b3-calendar" *ngSwitchCase="selectorMode.months">
+  <div class="b3-calendar" *ngSwitchCase="'months'">
     <div class="b3-calendar__header">
       <button class="b3-calendar__btn b3-calendar__btn_prev"
         (click)="stepPrevMonth()">
@@ -46,7 +46,7 @@
       </button>
       <div class="b3-calendar__header__control-content">
         <button class="b3-calendar__btn b3-calendar__btn_month">
-          {{monthNames[selectedValue.getMonth()]}}
+          {{monthNames[currentMonth]}}
         </button>
       </div>
       <button class="b3-calendar__btn b3-calendar__btn_next"
@@ -56,10 +56,10 @@
     </div>
     <div class="b3-calendar__content">
       <div class="b3-calendar__content__control-content"></div>
-      <ul class="b3-calendar__month-list">
+      <ul class="b3-calendar__month-list" style="white-space:normal">
         <li *ngFor="let monthName of monthNames; index as monthId" class="b3-calendar__month-list__item"
-          (click)="changeSelectedMonth(monthId); currentMode = selectorMode.days"
-          [ngClass]="{'b3-calendar__month_selected': isSelectedMonth(monthId) }">
+          (click)="changeCurrentMonth(monthId); currentMode = 'days'"
+          [ngClass]="{'b3-calendar__month_selected': isCurrentMonth(monthId) }">
           <span>
             {{monthName}}
           </span>
@@ -68,16 +68,16 @@
     </div>
   </div>
 
-  <div class="b3-calendar" *ngSwitchCase="selectorMode.days">
+  <div class="b3-calendar" *ngSwitchCase="'days'">
     <div class="b3-calendar__header">
       <button class="b3-calendar__btn b3-calendar__btn_prev" 
         (click)="stepPrevDay()"><span class="icon icon_chevron-left"></span></button>
       <div class="b3-calendar__header__control-content">
         <div class="b3-calendar__header__day-number">
-          {{selectedValue.getDate()}}
+          {{getSelectedDayText()}}
         </div>
         <div class="b3-calendar__header__day-title">
-          {{weekDaysNames[correctWeekDay(selectedValue.getDay())]}}
+          {{getSelectedMonthText()}} {{getSelectedFullYearText()}}
         </div>
       </div>
       <button class="b3-calendar__btn b3-calendar__btn_next"
@@ -86,13 +86,13 @@
     <div class="b3-calendar__content">
       <div class="b3-calendar__content__control-content">
         <button class="b3-calendar__btn b3-calendar__btn_month"
-          (click)="currentMode = selectorMode.months">
-            {{monthNames[selectedValue.getMonth()]}}
+          (click)="currentMode = 'months'">
+            {{monthNames[currentMonth]}}
           <div class="b3-arrow-dd"></div>
         </button>
         <button class="b3-calendar__btn b3-calendar__btn_year"
-        (click)="currentMode = selectorMode.years">
-          {{selectedValue.getFullYear()}}
+        (click)="currentMode = 'years'">
+          {{currentYear}}
           <div class="b3-arrow-dd"></div>
         </button>
       </div>
@@ -107,7 +107,7 @@
         <tbody>
           <tr *ngFor="let day of [1,2,3,4,5,6]; index as row">
             <td *ngFor="let dayNameShort of weekDaysNamesShort; index as col" class="b3-calendar__day"
-              (click)="changeSelectedDay(calculateShowingDay(row, col))"
+              (click)="changeDay(calculateShowingDay(row, col))"
               [ngClass]="{'b3-calendar__day_current':  isTodayDay(calculateShowingDay(row, col)),
                           'b3-calendar__day_selected': isSelectedDay(calculateShowingDay(row, col)) }">
               <span *ngIf="isValidDay(calculateShowingDay(row, col))">
@@ -120,8 +120,8 @@
     </div>
     <div class="b3-calendar__footer">
       <div class="b3-calendar__footer__control-content">
-        <button class="b3-calendar__btn" (click)="cancel()">Отмена</button>
-        <button class="b3-calendar__btn" (click)="ok()">Ок</button>
+        <button class="b3-calendar__btn" (click)="clear()">Очистить</button>
+        <button class="b3-calendar__btn" (click)="selectTodayDay()">Текущая дата</button>
       </div>
     </div>
   </div>

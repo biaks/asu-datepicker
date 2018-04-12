@@ -11,6 +11,14 @@ export class AppComponent implements OnInit {
   // https://medium.com/@maks.zhitlov/reactive-forms-in-angular-2f8abe884f79 - Реактивные формы (Reactive Forms) в Angular 2+
   // http://stepansuvorov.com/blog/2017/07/angular-forms-and-validation/ - Формы и валидация данных в Angular
 
+  comment0: string = "";
+  field_key0: string = "fieldkey";
+
+  checkEmit0 (type: string) {
+    this.comment0 = type;
+  }
+
+  formControl0: FormControl = new FormControl("");
   formControl1: FormControl = new FormControl(new Date(2011,1-1,1));
   formControl2: FormControl = new FormControl(new Date(2012,2-1,2));
 
@@ -18,6 +26,7 @@ export class AppComponent implements OnInit {
   date2: Date = new Date(2014,4-1,4);
   date3: Date = new Date(2015,5-1,5);
 
+  setFormControl0() { this.formControl0.setValue (new Date().toISOString().substr(0,10)); }
   setFormControl1() { this.formControl1.setValue (new Date()); }
   setFormControl2() { this.formControl2.setValue (new Date()); }
 
